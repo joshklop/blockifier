@@ -37,7 +37,7 @@ use crate::execution::execution_utils::felt_to_stark_felt;
 use crate::fee::eth_gas_constants;
 use crate::fee::fee_utils::calculate_tx_fee;
 use crate::fee::gas_usage::{calculate_tx_gas_usage, estimate_minimal_l1_gas};
-use crate::state::cached_state::{CachedState, StateChangesCount};
+use crate::state::cached_state::{CachedState, StateChangesCount, TransactionalState};
 use crate::state::errors::StateError;
 use crate::state::state_api::{State, StateReader};
 use crate::test_utils::cached_state::create_test_state;
@@ -662,7 +662,7 @@ fn test_actual_fee_gt_resource_bounds(state: &mut CachedState<DictStateReader>) 
     &mut create_state_with_cairo1_account();
     "With Cairo1 account")]
 fn test_invalid_nonce(state: &mut CachedState<DictStateReader>) {
-    let mut transactional_state = CachedState::create_transactional(state);
+    let mut transactional_state = TransactionalState::new_transactional(state);
     let block_context = &BlockContext::create_for_account_testing();
     let valid_invoke_tx_args = default_invoke_tx_args();
 
