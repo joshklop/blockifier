@@ -722,3 +722,73 @@ impl Default for GlobalContractCache {
         Self(Arc::new(Mutex::new(ContractClassLRUCache::with_size(Self::CACHE_SIZE))))
     }
 }
+
+impl StateReader for Box<dyn State> {
+    fn get_storage_at(
+        &mut self,
+        contract_address: ContractAddress,
+        key: StorageKey,
+    ) -> StateResult<StarkFelt> {
+        self.as_mut().get_storage_at(contract_address, key)
+    }
+
+    fn get_nonce_at(&mut self, contract_address: ContractAddress) -> StateResult<Nonce> {
+        self.as_mut().get_nonce_at(contract_address)
+    }
+
+    fn get_class_hash_at(&mut self, contract_address: ContractAddress) -> StateResult<ClassHash> {
+        self.as_mut().get_class_hash_at(contract_address)
+    }
+
+    fn get_compiled_contract_class(&mut self, class_hash: &ClassHash)
+    -> StateResult<ContractClass> {
+        self.as_mut().get_compiled_contract_class(class_hash)
+    }
+
+    fn get_compiled_class_hash(&mut self, class_hash: ClassHash) -> StateResult<CompiledClassHash> {
+        self.as_mut().get_compiled_class_hash(class_hash)
+    }
+}
+
+impl State for Box<dyn State> {
+    fn set_storage_at(
+        &mut self,
+        contract_address: ContractAddress,
+        key: StorageKey,
+        value: StarkFelt,
+    ) {
+        self.as_mut().set_storage_at(contract_address, key, value)
+    }
+
+    fn increment_nonce(&mut self, contract_address: ContractAddress) -> StateResult<()> {
+        self.as_mut().increment_nonce(contract_address)
+    }
+
+    fn set_class_hash_at(
+        &mut self,
+        contract_address: ContractAddress,
+        class_hash: ClassHash,
+    ) -> StateResult<()> {
+        self.as_mut().set_class_hash_at(contract_address, class_hash)
+    }
+
+    fn set_contract_class(
+        &mut self,
+        class_hash: &ClassHash,
+        contract_class: ContractClass,
+    ) -> StateResult<()> {
+        self.as_mut().set_contract_class(class_hash, contract_class)
+    }
+
+    fn set_compiled_class_hash(
+        &mut self,
+        class_hash: ClassHash,
+        compiled_class_hash: CompiledClassHash,
+    ) -> StateResult<()> {
+        self.as_mut().set_compiled_class_hash(class_hash, compiled_class_hash)
+    }
+
+    fn to_state_diff(&mut self) -> CommitmentStateDiff {
+        self.as_mut().to_state_diff()
+    }
+}
